@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Placement Portal | Placement Management System</title>
+    <meta name="description" content="Automated platform for college placement activities, records, and job opportunity management.">
+    
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Mobile Menu Button -->
+        <button class="menu-toggle" id="menu-toggle" onclick="toggleSidebar()">☰</button>
+        
+        <!-- Dark Overlay for Mobile -->
+        <div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar()"></div>
+        
+        <!-- Sidebar is injected here -->
+        <aside id="sidebar-container"></aside>
+        
+        <!-- Main Content Area -->
+        <main id="main-content">
+            <div id="view-loading" class="fade-in">
+                <h1 style="margin-bottom: 0.5rem;">Placement Portal</h1>
+                <p>Loading database and interface...</p>
+            </div>
+            <div id="router-view"></div>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/api.js"></script>
+    <script src="js/components.js"></script>
+    <script src="js/app.js"></script>
+    <script>
+        // Refresh icons after dynamic injection
+        window.addEventListener('view-changed', () => {
+            lucide.createIcons();
+        });
+
+        // Mobile sidebar toggle
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            if (sidebar) {
+                sidebar.classList.toggle('open');
+                overlay.classList.toggle('active');
+            }
+        }
+
+        // Auto-close sidebar when a nav link is clicked on mobile
+        document.addEventListener('click', (e) => {
+            if (e.target.closest('.nav-link')) {
+                const sidebar = document.querySelector('.sidebar');
+                const overlay = document.getElementById('sidebar-overlay');
+                if (sidebar && window.innerWidth <= 768) {
+                    sidebar.classList.remove('open');
+                    overlay.classList.remove('active');
+                }
+            }
+        });
+    </script>
+</body>
+</html>
