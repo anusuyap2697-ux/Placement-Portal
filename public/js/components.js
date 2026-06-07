@@ -8,8 +8,12 @@ const Components = {
             { id: 'applications', icon: 'clipboard-list', label: 'Applications' },
             { id: 'resumes', icon: 'file-text', label: 'Resumes' },
             { id: 'interviews', icon: 'calendar-clock', label: 'Interviews' },
+            { id: 'skill-gap', icon: 'target', label: 'Skill Gap' },
+            { id: 'training', icon: 'book-open', label: 'Training' },
+            { id: 'resume-score', icon: 'file-search', label: 'Resume Scorer' },
+            { id: 'alumni', icon: 'graduation-cap', label: 'Alumni Mentors' },
             { id: 'notifications', icon: 'bell', label: 'Notifications' },
-            { id: 'offers', icon: 'gift', label: 'Placement Tracking' },
+            { id: 'offers', icon: 'gift', label: 'Offers & Drives' },
             { id: 'predictor', icon: 'brain', label: 'Predictor' },
             { id: 'ranking', icon: 'trophy', label: 'Ranking' },
             { id: 'reports', icon: 'bar-chart-3', label: 'Reports' },
@@ -123,13 +127,29 @@ const Components = {
                     <input type="number" step="0.1" name="eligibility" placeholder="Min CGPA" class="glass" style="border:1px solid var(--surface-border);border-radius:var(--radius-md);padding:0.5rem;color:white;" required>
                     <input type="number" name="max_arrears" placeholder="Max Arrears" value="0" class="glass" style="border:1px solid var(--surface-border);border-radius:var(--radius-md);padding:0.5rem;color:white;">
                     <input type="text" name="package" placeholder="Package" class="glass" style="border:1px solid var(--surface-border);border-radius:var(--radius-md);padding:0.5rem;color:white;" required>
+                    <input type="text" name="required_skills" placeholder="Skills (comma sep)" class="glass" style="border:1px solid var(--surface-border);border-radius:var(--radius-md);padding:0.5rem;color:white;">
+                    <select name="type" class="glass" style="border:1px solid var(--surface-border);border-radius:var(--radius-md);padding:0.5rem;color:white;"><option value="Full-Time">Full-Time</option><option value="Internship">Internship</option></select>
                     <input type="date" name="deadline" class="glass" style="border:1px solid var(--surface-border);border-radius:var(--radius-md);padding:0.5rem;color:white;" required>
                     <button type="submit" class="btn btn-primary">Publish</button>
                 </form>
             </div>
             <div class="stats-grid" style="grid-template-columns:repeat(auto-fill,minmax(300px,1fr));">
-                ${jobs.map(j=>`<div class="card glass"><div style="display:flex;justify-content:space-between;"><div><h3 style="color:var(--primary);font-size:1.1rem;">${j.title}</h3><p style="font-size:0.85rem;">${j.company_name}</p></div><span style="background:rgba(16,185,129,0.1);color:var(--success);padding:4px 8px;border-radius:4px;font-size:0.7rem;font-weight:700;height:fit-content;">${j.package}</span></div>
-                    <div style="font-size:0.8rem;color:var(--text-muted);display:flex;flex-direction:column;gap:0.2rem;"><span>Min CGPA: ${j.eligibility}</span><span>Max Arrears: ${j.max_arrears||0}</span><span>Deadline: ${j.deadline}</span></div>
+                ${jobs.map(j=>`<div class="card glass">
+                    <div style="display:flex;justify-content:space-between;">
+                        <div>
+                            <div style="display:flex;gap:0.5rem;align-items:center;">
+                                <h3 style="color:var(--primary);font-size:1.1rem;margin:0;">${j.title}</h3>
+                                <span style="background:rgba(99,102,241,0.15);color:var(--accent);padding:2px 6px;border-radius:10px;font-size:0.55rem;font-weight:700;">${j.type||'Full-Time'}</span>
+                            </div>
+                            <p style="font-size:0.85rem;margin:0.2rem 0;">${j.company_name}</p>
+                        </div>
+                        <span style="background:rgba(16,185,129,0.1);color:var(--success);padding:4px 8px;border-radius:4px;font-size:0.7rem;font-weight:700;height:fit-content;">${j.package}</span>
+                    </div>
+                    <div style="font-size:0.8rem;color:var(--text-muted);display:flex;flex-direction:column;gap:0.2rem;margin:0.5rem 0;">
+                        <span>Req: ${j.required_skills ? j.required_skills.split(',').join(', ') : 'Any'}</span>
+                        <span>Min CGPA: ${j.eligibility} | Max Arrears: ${j.max_arrears||0}</span>
+                        <span>Deadline: ${j.deadline}</span>
+                    </div>
                     <div style="display:flex;gap:0.5rem;"><input type="text" id="apply-sid-${j.id}" placeholder="Student ID" class="glass" style="border:1px solid var(--surface-border);border-radius:var(--radius-md);padding:0.25rem 0.5rem;color:white;width:60%;font-size:0.8rem;"><button class="btn btn-primary" style="width:40%;padding:0.5rem;" onclick="App.applyJob('${j.id}')">Apply</button></div>
                 </div>`).join('')}
             </div></div>`;
@@ -203,7 +223,11 @@ const Components = {
     ReportsView(stats, deptReports, companyReports) {
         return `<div class="fade-in">
             <header style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2rem;"><div><h1>📊 Placement Reports</h1><p>Comprehensive analytics and department-wise/company-wise reports</p></div>
-                <a href="/api/export/ranking" class="btn btn-primary" style="text-decoration:none;" download><i data-lucide="download" size="16"></i> Export CSV</a></header>
+                <div style="display:flex;gap:1rem;">
+                    <button onclick="window.print()" class="btn" style="background:var(--danger);color:white;border:none;"><i data-lucide="printer" size="16"></i> Generate PDF Report</button>
+                    <a href="/api/export/ranking" class="btn btn-primary" style="text-decoration:none;" download><i data-lucide="download" size="16"></i> Export CSV</a>
+                </div>
+            </header>
             <div class="glass" style="padding:2rem;margin-bottom:1.5rem;"><h3>Overall Selection Ratio</h3>
                 <div style="height:14px;background:rgba(255,255,255,0.1);border-radius:7px;margin:1rem 0;overflow:hidden;"><div style="width:${stats.totalStudents>0?(stats.placedStudents/stats.totalStudents)*100:0}%;height:100%;background:linear-gradient(90deg,var(--primary),var(--secondary));transition:width 1s;"></div></div>
                 <p style="font-size:1.2rem;font-weight:700;">${stats.totalStudents>0?Math.round((stats.placedStudents/stats.totalStudents)*100):0}% Placement Rate</p>
@@ -279,5 +303,73 @@ const Components = {
             <div class="glass" style="padding:1.5rem;"><div class="table-container"><table><thead><tr><th>Rank</th><th>Student</th><th>Dept</th><th>CGPA</th><th>DOB</th><th>Age</th><th>Arrears</th><th>Status</th><th>Tie?</th></tr></thead><tbody>
                 ${rankedStudents.map((s,i)=>{const r=i+1;const tied=cg[s.gpa]>1;const age=s.dob?Math.floor((Date.now()-new Date(s.dob).getTime())/(365.25*24*60*60*1000)):'N/A';return `<tr><td><span style="display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:50%;${rs(r)};font-size:${r<=3?'1.1rem':'0.8rem'};">${medal(r)}</span></td><td><div style="font-weight:600;">${s.name}</div><div style="font-size:0.65rem;color:var(--text-muted);">${s.id}</div></td><td>${s.dept}</td><td style="font-weight:700;color:var(--primary);">${s.gpa}</td><td style="font-size:0.8rem;">${s.dob?new Date(s.dob).toLocaleDateString('en-IN'):'N/A'}</td><td>${age} yrs</td><td>${s.arrears>0?`<span style="color:var(--danger);">${s.arrears}</span>`:'0'}</td><td><span style="color:${s.status==='Selected'?'var(--success)':'var(--warning)'};font-weight:600;">${s.status}</span></td><td>${tied?'<span style="background:rgba(236,72,153,0.15);color:var(--secondary);padding:2px 6px;border-radius:4px;font-size:0.65rem;font-weight:600;">DOB</span>':'—'}</td></tr>`;}).join('')}
             </tbody></table></div></div></div>`;
+    },
+
+    SkillGapAnalyzer(data) {
+        return `<div class="fade-in">
+            <header style="margin-bottom:2rem;"><h1>🎯 Skill Gap Analysis</h1><p>Identify missing skills for specific company requirements</p></header>
+            <div class="stats-grid" style="grid-template-columns:repeat(auto-fill,minmax(300px,1fr));">
+                ${data.map(s => `<div class="card glass">
+                    <h3 style="font-size:1.1rem;margin-bottom:0.5rem;color:var(--primary);">${s.student_name} <span style="font-size:0.7rem;color:var(--text-muted);">(${s.student_id})</span></h3>
+                    ${s.job_matches.map(j => `<div style="margin-top:0.8rem;padding-top:0.8rem;border-top:1px solid rgba(255,255,255,0.1);">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.4rem;">
+                            <span style="font-size:0.85rem;font-weight:600;">${j.job_title}</span>
+                            <span style="font-size:0.75rem;font-weight:700;color:${j.match_percent>=80?'var(--success)':j.match_percent>=50?'var(--warning)':'var(--danger)'};">${j.match_percent}% Match</span>
+                        </div>
+                        <div style="font-size:0.7rem;color:var(--text-muted);margin-bottom:0.2rem;">Required: ${j.required.join(', ')}</div>
+                        <div style="font-size:0.7rem;">Missing: ${j.missing.length===0?'<span style="color:var(--success);">None!</span>':j.missing.map(m=>`<span style="color:var(--danger);font-weight:600;">${m}</span>`).join(', ')}</div>
+                    </div>`).join('')}
+                </div>`).join('')}
+            </div>
+        </div>`;
+    },
+
+    TrainingPortal(modules) {
+        return `<div class="fade-in">
+            <header style="margin-bottom:2rem;"><h1>📚 Training & Mock Tests</h1><p>Aptitude, Coding Assessments, and Mock Interviews</p></header>
+            <div class="stats-grid">
+                ${modules.map(m => `<div class="card glass">
+                    <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:1rem;">
+                        <span style="padding:4px 8px;border-radius:4px;font-size:0.65rem;font-weight:700;background:rgba(99,102,241,0.15);color:var(--primary);">${m.type.toUpperCase()}</span>
+                        <span style="font-size:0.75rem;color:var(--text-muted);">${new Date(m.date).toLocaleDateString('en-IN')}</span>
+                    </div>
+                    <h3 style="font-size:1.1rem;margin-bottom:1rem;">${m.title}</h3>
+                    <a href="${m.link}" target="_blank" class="btn btn-primary" style="display:block;text-align:center;text-decoration:none;">Start Module</a>
+                </div>`).join('')}
+            </div>
+        </div>`;
+    },
+
+    AlumniNetwork(alumni) {
+        return `<div class="fade-in">
+            <header style="margin-bottom:2rem;"><h1>🎓 Alumni Mentorship</h1><p>Connect with placed alumni for guidance</p></header>
+            <div class="stats-grid">
+                ${alumni.map(a => `<div class="card glass">
+                    <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1rem;">
+                        <div style="width:50px;height:50px;border-radius:50%;background:linear-gradient(135deg, var(--secondary), var(--accent));display:flex;align-items:center;justify-content:center;color:white;font-size:1.5rem;font-weight:bold;">${a.name.charAt(0)}</div>
+                        <div>
+                            <h3 style="font-size:1.1rem;">${a.name}</h3>
+                            <p style="font-size:0.8rem;color:var(--text-muted);">${a.position} at <strong style="color:white;">${a.company}</strong></p>
+                        </div>
+                    </div>
+                    <div style="font-size:0.8rem;margin-bottom:0.5rem;"><i data-lucide="mail" size="14" style="vertical-align:middle;margin-right:5px;"></i>${a.email}</div>
+                    <div style="font-size:0.8rem;"><i data-lucide="linkedin" size="14" style="vertical-align:middle;margin-right:5px;"></i><a href="https://${a.linkedin}" target="_blank" style="color:var(--primary);text-decoration:none;">${a.linkedin}</a></div>
+                </div>`).join('')}
+            </div>
+        </div>`;
+    },
+
+    ResumeScorer() {
+        return `<div class="fade-in">
+            <header style="margin-bottom:2rem;"><h1>📄 Resume Scoring (AI Simulated)</h1><p>Evaluates resumes and suggests improvements</p></header>
+            <div class="glass" style="padding:2rem;max-width:500px;margin:0 auto;text-align:center;">
+                <h3 style="margin-bottom:1rem;">Select Student to Analyze</h3>
+                <form onsubmit="App.handleResumeScore(event)" style="display:flex;gap:1rem;">
+                    <input type="text" name="student_id" placeholder="Student ID (e.g. S001)" class="glass" style="flex:1;border:1px solid var(--surface-border);border-radius:var(--radius-md);padding:0.75rem;color:white;" required>
+                    <button type="submit" class="btn btn-primary">Analyze</button>
+                </form>
+                <div id="resume-score-result" style="margin-top:2rem;display:none;"></div>
+            </div>
+        </div>`;
     }
 };

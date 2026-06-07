@@ -489,6 +489,76 @@ app.get('/api/search', (req, res) => {
     });
 });
 
+// ===== 16. SKILL GAP ANALYSIS =====
+app.get('/api/skills/gap', (req, res) => {
+    db.all("SELECT id, name, skills FROM students", [], (err, students) => {
+        if (err) return res.status(500).json({ error: err.message });
+        db.all("SELECT id, title, required_skills FROM jobs WHERE required_skills != ''", [], (err, jobs) => {
+            if (err) return res.status(500).json({ error: err.message });
+            const analysis = students.map(student => {
+                const sSkills = student.skills ? student.skills.toLowerCase().split(',').map(s => s.trim()) : [];
+                const jobGaps = jobs.map(job => {
+                    const jSkills = job.required_skills.toLowerCase().split(',').map(s => s.trim());
+                    const missing = jSkills.filter(js => !sSkills.includes(js));
+                    return { job_title: job.title, required: jSkills, missing: missing, match_percent: Math.round(((jSkills.length - missing.length) / jSkills.length) * 100) || 0 };
+                }).filter(jg => jg.match_percent > 0).sort((a,b) => b.match_percent - a.match_percent);
+                return { student_id: student.id, student_name: student.name, job_matches: jobGaps.slice(0, 3) };
+            });
+            res.json(analysis);
+        });
+    });
+});
+
+// ===== 17. TRAINING & MOCK TESTS =====
+app.get('/api/training', (req, res) => {
+    db.all("SELECT * FROM training_modules ORDER BY date DESC", [], (err, rows) => {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json(rows);
+    });
+});
+
+// ===== 18. ALUMNI MENTORSHIP =====
+app.get('/api/alumni', (req, res) => {
+    db.all("SELECT * FROM alumni", [], (err, rows) => {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json(rows);
+    });
+});
+
+// ===== 19. RESUME SCORING (SIMULATED) =====
+app.get('/api/resumes/score/:student_id', (req, res) => {
+    db.get("SELECT gpa, skills, arrears FROM students WHERE id = ?", [req.params.student_id], (err, student) => {
+        if (!student) return res.status(404).json({ error: "Student not found" });
+        db.get("SELECT filename FROM resumes WHERE student_id = ? ORDER BY uploaded_at DESC LIMIT 1", [req.params.student_id], (err, resume) => {
+            if (!resume) return res.json({ score: 0, feedback: "No resume uploaded. Please upload a resume first." });
+            let score = 50;
+            let feedback = [];
+            if (student.gpa >= 8.5) { score += 20; feedback.push("Excellent academic record highlighted."); }
+            else if (student.gpa >= 7.0) { score += 10; feedback.push("Good academics, but emphasize technical skills more."); }
+            else { feedback.push("Focus on highlighting projects and certifications to offset lower GPA."); }
+            
+            const skillCount = student.skills ? student.skills.split(',').length : 0;
+            if (skillCount >= 5) { score += 20; feedback.push("Strong technical skills section."); }
+            else if (skillCount > 0) { score += 10; feedback.push("Add more relevant technical skills."); }
+            else { feedback.push("CRITICAL: Your resume is missing a clear skills section."); }
+            
+            if (student.arrears === 0) { score += 10; }
+            else { feedback.push("Ensure you mention how you overcame academic challenges."); }
+            
+            res.json({ score: Math.min(score, 100), suggestions: feedback });
+        });
+    });
+});
+
+// ===== 20. DRIVE REGISTRATIONS =====
+app.post('/api/drives/:id/register', (req, res) => {
+    const { student_id } = req.body;
+    db.run("INSERT INTO drive_registrations (student_id, drive_id) VALUES (?, ?)", [student_id, req.params.id], function(err) {
+        if (err) return res.status(400).json({ error: "Already registered or error: " + err.message });
+        res.json({ message: "Successfully registered for drive!" });
+    });
+});
+
 // Multer error handler
 app.use((err, req, res, next) => {
     if (err instanceof multer.MulterError) {

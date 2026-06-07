@@ -71,6 +71,18 @@ const App = {
                     const [rStats, deptR, compR] = await Promise.all([API.getStats(), API.getDeptReports(), API.getCompanyReports()]);
                     html = Components.ReportsView(rStats, deptR, compR);
                     break;
+                case 'skill-gap':
+                    html = Components.SkillGapAnalyzer(await API.getSkillGaps());
+                    break;
+                case 'training':
+                    html = Components.TrainingPortal(await API.getTrainingModules());
+                    break;
+                case 'alumni':
+                    html = Components.AlumniNetwork(await API.getAlumni());
+                    break;
+                case 'resume-score':
+                    html = Components.ResumeScorer();
+                    break;
                 default:
                     html = `<div class="fade-in"><h1>${this.currentView.toUpperCase()} Module</h1><p>Under construction.</p></div>`;
             }
@@ -184,6 +196,31 @@ const App = {
         event.preventDefault();
         const d = Object.fromEntries(new FormData(event.target).entries());
         try { await API.addOffer(d); alert('Offer recorded!'); event.target.reset(); this.renderView(); } catch(e) { alert('Error: ' + e.message); }
+    },
+
+    // ===== RESUME SCORING HANDLER =====
+    async handleResumeScore(event) {
+        event.preventDefault();
+        const sid = new FormData(event.target).get('student_id');
+        const resDiv = document.getElementById('resume-score-result');
+        resDiv.style.display = 'block';
+        resDiv.innerHTML = '<p>Analyzing...</p>';
+        try {
+            const data = await API.getResumeScore(sid);
+            if (data.error) throw new Error(data.error);
+            const color = data.score >= 80 ? 'var(--success)' : data.score >= 50 ? 'var(--warning)' : 'var(--danger)';
+            resDiv.innerHTML = `
+                <div style="font-size:3rem;font-weight:800;color:${color};margin-bottom:1rem;">${data.score}/100</div>
+                <div style="text-align:left;background:rgba(255,255,255,0.05);padding:1.5rem;border-radius:var(--radius-md);">
+                    <h4 style="margin-bottom:0.5rem;color:var(--primary);">AI Feedback & Suggestions</h4>
+                    <ul style="font-size:0.85rem;color:var(--text-muted);padding-left:1rem;">
+                        ${data.suggestions ? data.suggestions.map(s=>`<li style="margin-bottom:0.4rem;">${s}</li>`).join('') : `<li>${data.feedback}</li>`}
+                    </ul>
+                </div>
+            `;
+        } catch(e) {
+            resDiv.innerHTML = `<p style="color:var(--danger);">${e.message}</p>`;
+        }
     },
 
     // ===== GLOBAL SEARCH =====

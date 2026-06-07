@@ -48,6 +48,12 @@ const API = {
     async getDeptReports() { return (await fetch('/api/reports/department')).json(); },
     async getCompanyReports() { return (await fetch('/api/reports/company')).json(); },
     
-    async search(q) { return (await fetch(`/api/search?q=${encodeURIComponent(q)}`)).json(); }
+    async search(q) { return (await fetch(`/api/search?q=${encodeURIComponent(q)}`)).json(); },
+
+    async getSkillGaps() { return (await fetch('/api/skills/gap')).json(); },
+    async getTrainingModules() { return (await fetch('/api/training')).json(); },
+    async getAlumni() { return (await fetch('/api/alumni')).json(); },
+    async getResumeScore(id) { return (await fetch(`/api/resumes/score/${id}`)).json(); },
+    async registerForDrive(id, sid) { const r = await fetch(`/api/drives/${id}/register`, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({student_id:sid}) }); if (!r.ok) { const e = await r.json(); throw new Error(e.error); } return r.json(); }
 };
 window.API = API;
