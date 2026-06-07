@@ -180,16 +180,6 @@ function initializeSchema() {
                 
                 db.run(`INSERT INTO admins (id, username, password) VALUES ('A001', 'admin', 'admin123')`);
 
-                db.run(`INSERT INTO students (id, name, dept, gpa, email, phone, dob, skills, arrears, verified, status) VALUES 
-                    ('S001', 'John Doe', 'CSE', 8.5, 'john.doe@college.edu', '9876543210', '2003-05-14', 'React,JavaScript,Node.js,MongoDB', 0, 1, 'Selected'),
-                    ('S002', 'Jane Smith', 'ECE', 7.8, 'jane.smith@college.edu', '9876543211', '2003-08-22', 'Python,MATLAB,Circuit Design', 0, 1, 'Applied'),
-                    ('S003', 'Mike Ross', 'CSE', 9.2, 'mike.ross@college.edu', '9876543212', '2002-12-03', 'Python,TensorFlow,Machine Learning,Data Science', 0, 1, 'Selected'),
-                    ('S004', 'Rachel Zane', 'MECH', 8.1, 'rachel.zane@college.edu', '9876543213', '2003-03-17', 'AutoCAD,SolidWorks,ANSYS', 1, 0, 'Applied'),
-                    ('S005', 'Harvey Specter', 'CSE', 7.5, 'harvey@college.edu', '9876543214', '2003-01-10', 'Java,Spring Boot,AWS', 0, 1, 'Applied'),
-                    ('S006', 'Donna Paulsen', 'IT', 8.8, 'donna@college.edu', '9876543215', '2003-06-25', 'React,Angular,UI/UX Design', 0, 1, 'Applied'),
-                    ('S007', 'Louis Litt', 'ECE', 6.9, 'louis@college.edu', '9876543216', '2002-11-08', 'VLSI,Embedded Systems', 2, 0, 'Applied'),
-                    ('S008', 'Jessica Pearson', 'MECH', 9.0, 'jessica@college.edu', '9876543217', '2003-09-30', 'AutoCAD,CATIA,Thermal Analysis', 0, 1, 'Selected')`);
-
                 db.run(`INSERT INTO companies (id, name, industry, website, contact, approved) VALUES 
                     ('C001', 'Tech Giant', 'Software Development', 'techgiant.com', 'hr@techgiant.com', 1),
                     ('C002', 'Innovate AI', 'AI & Machine Learning', 'innovate.ai', 'careers@innovate.ai', 1),
@@ -214,57 +204,15 @@ function initializeSchema() {
                     ('Bob Smith', 'Innovate AI', 'Data Scientist', 'bob@example.com', 'linkedin.com/in/bobsmith'),
                     ('Charlie Brown', 'DataVerse Inc', 'Product Manager', 'charlie@example.com', 'linkedin.com/in/charlieb')`);
 
-                db.run(`INSERT INTO applications (student_id, job_id, status) VALUES 
-                    ('S001', 'J001', 'Selected'),
-                    ('S002', 'J001', 'Shortlisted'),
-                    ('S003', 'J002', 'Selected'),
-                    ('S004', 'J003', 'Applied'),
-                    ('S005', 'J001', 'Applied'),
-                    ('S005', 'J004', 'Shortlisted'),
-                    ('S006', 'J001', 'Applied'),
-                    ('S006', 'J005', 'Shortlisted'),
-                    ('S008', 'J003', 'Selected')`);
-
                 db.run(`INSERT INTO placement_drives (id, name, date, eligibility_gpa, status) VALUES 
                     ('D001', 'Mega Tech Drive 2026', '2026-09-10', 7.5, 'Active'),
                     ('D002', 'Core Engineering Placements', '2026-10-05', 7.0, 'Upcoming'),
                     ('D003', 'Super Dream Drive', '2027-01-20', 8.0, 'Upcoming')`);
 
-                db.run(`INSERT INTO interviews (student_id, job_id, round, scheduled_date, scheduled_time, venue, status, feedback) VALUES 
-                    ('S001', 'J001', 'Technical Round 1', '2027-01-15', '10:00', 'Room 301', 'Completed', 'Strong problem-solving'),
-                    ('S001', 'J001', 'HR Round', '2027-01-18', '14:00', 'Online - Zoom', 'Completed', 'Excellent communication'),
-                    ('S003', 'J002', 'Aptitude Test', '2027-03-28', '09:00', 'Exam Hall A', 'Completed', 'Scored 92/100'),
-                    ('S003', 'J002', 'Technical Round 1', '2027-04-02', '11:00', 'Room 205', 'Scheduled', ''),
-                    ('S002', 'J001', 'Aptitude Test', '2027-01-15', '09:00', 'Exam Hall A', 'Completed', 'Scored 78/100'),
-                    ('S004', 'J003', 'Technical Round 1', '2027-05-25', '10:30', 'Online - Teams', 'Scheduled', ''),
-                    ('S005', 'J004', 'Group Discussion', '2027-04-18', '11:00', 'Seminar Hall', 'Scheduled', ''),
-                    ('S006', 'J005', 'Technical Round 1', '2027-02-22', '10:00', 'Room 102', 'Scheduled', '')`);
-
                 db.run(`INSERT INTO notifications (type, title, message, target) VALUES 
                     ('announcement', 'Mega Tech Drive 2026', 'Tech Giant, Innovate AI, and 3 more companies visiting on Sep 10. All eligible students must register.', 'all'),
-                    ('result', 'Selection Result: Tech Giant', 'John Doe and Mike Ross have been selected for Frontend Software Engineer and Data Science Intern respectively.', 'all'),
-                    ('interview', 'Interview Schedule Update', 'Technical Round 1 for System Administrator at Apex Bio scheduled for May 25, 2027.', 'S004'),
                     ('alert', 'Resume Submission Deadline', 'All students must upload their updated resume before Jan 1, 2027.', 'all'),
-                    ('announcement', 'New Company: DataVerse Inc', 'DataVerse Inc (Data Analytics) has been approved and will be posting jobs soon.', 'all'),
-                    ('result', 'Shortlist: Backend Developer', 'Donna Paulsen shortlisted for Backend Developer at Tech Giant.', 'S006')`);
-
-                db.run(`INSERT INTO offers (student_id, company_id, job_id, package, offer_date, joining_date, status) VALUES 
-                    ('S001', 'C001', 'J001', '12 LPA', '2027-01-20', '2027-07-01', 'Accepted'),
-                    ('S003', 'C002', 'J002', '18 LPA', '2027-04-10', '2027-07-15', 'Offered'),
-                    ('S008', 'C003', 'J003', '8 LPA', '2027-06-01', '2027-08-01', 'Accepted')`);
-
-                db.run(`INSERT INTO activity_log (action, entity_type, entity_id, description) VALUES 
-                    ('CREATE', 'student', 'S001', 'John Doe registered in CSE department'),
-                    ('CREATE', 'student', 'S003', 'Mike Ross registered in CSE department'),
-                    ('VERIFY', 'student', 'S001', 'John Doe profile verified by admin'),
-                    ('APPLY', 'application', 'S001', 'John Doe applied for Frontend Software Engineer'),
-                    ('SHORTLIST', 'application', 'S002', 'Jane Smith shortlisted for Frontend Software Engineer'),
-                    ('SELECT', 'application', 'S001', 'John Doe selected for Frontend Software Engineer'),
-                    ('SELECT', 'application', 'S003', 'Mike Ross selected for Data Science Intern'),
-                    ('OFFER', 'offer', 'S001', 'Offer letter sent to John Doe - 12 LPA at Tech Giant'),
-                    ('SCHEDULE', 'interview', 'S001', 'Interview scheduled: Technical Round 1'),
-                    ('COMPLETE', 'interview', 'S001', 'Interview completed: John Doe passed Technical Round 1'),
-                    ('APPROVE', 'company', 'C005', 'DataVerse Inc approved by placement officer')`);
+                    ('announcement', 'New Company: DataVerse Inc', 'DataVerse Inc (Data Analytics) has been approved and will be posting jobs soon.', 'all')`);
                 
                 console.log('Seeding completed.');
             }
