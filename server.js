@@ -32,6 +32,53 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
+// ===== LOGIN & PASSWORD RESET =====
+app.post('/api/login', (req, res) => {
+    const { userid, password } = req.body;
+    db.get("SELECT * FROM students WHERE id = ? AND password = ?", [userid, password], (err, row) => {
+        if (err) return res.status(500).json({ error: err.message });
+        if (row) {
+            const user = { ...row };
+            delete user.password; // Don't send password to frontend
+            return res.json({ success: true, user, role: 'student' });
+        }
+        
+        if (userid === 'admin' && password === 'admin123') {
+            return res.json({ success: true, user: { id: 'admin', name: 'Administrator' }, role: 'admin' });
+        }
+        res.status(401).json({ error: 'Invalid User ID or Password' });
+    });
+});
+
+// Simulated OTP storage in memory (since we have no real email/DB for OTPs)
+const otps = {};
+
+app.post('/api/forgot-password', (req, res) => {
+    const { email } = req.body;
+    db.get("SELECT * FROM students WHERE email = ?", [email], (err, row) => {
+        if (err) return res.status(500).json({ error: err.message });
+        if (!row) return res.status(404).json({ error: 'Email not found' });
+        
+        // Simulate sending OTP (hardcoded to 123456 for demo)
+        otps[email] = '123456';
+        console.log(`[SIMULATION] Sent OTP 123456 to ${email}`);
+        res.json({ success: true, message: 'OTP sent to email (simulated)' });
+    });
+});
+
+app.post('/api/reset-password', (req, res) => {
+    const { email, otp, newPassword } = req.body;
+    if (otps[email] !== otp) {
+        return res.status(400).json({ error: 'Invalid or expired OTP' });
+    }
+    
+    db.run("UPDATE students SET password = ? WHERE email = ?", [newPassword, email], (err) => {
+        if (err) return res.status(500).json({ error: err.message });
+        delete otps[email];
+        res.json({ success: true, message: 'Password reset successfully' });
+    });
+});
+
 // ===== 1. STATS =====
 app.get('/api/stats', (req, res) => {
     const stats = {};
@@ -71,10 +118,12 @@ app.get('/api/students', (req, res) => {
 });
 
 app.post('/api/students', (req, res) => {
-    const { id, name, dept, gpa, email, phone, dob, skills, arrears } = req.body;
-    if (!id || !name) return res.status(400).json({ error: "ID and Name are required" });
-    db.run("INSERT INTO students (id, name, dept, gpa, email, phone, dob, skills, arrears) VALUES (?,?,?,?,?,?,?,?,?)",
-        [id, name, dept, gpa, email, phone||'', dob, skills||'', arrears||0],
+    const { id, name, dept, gpa, email, phone, dob, skills, arrears, password } = req.body;
+    const pwd = password || 'password123';
+    db.run(
+        `INSERT INTO students (id, name, dept, gpa, email, phone, dob, skills, arrears, password) 
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        [id, name, dept, gpa, email, phone, dob, skills, arrears || 0, pwd],
         function(err) {
             if (err) return res.status(500).json({ error: err.message });
             db.run("INSERT INTO activity_log (action, entity_type, entity_id, description) VALUES (?,?,?,?)",

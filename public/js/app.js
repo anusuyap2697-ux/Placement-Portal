@@ -1,26 +1,46 @@
 const App = {
     currentView: 'admin',
     searchTimeout: null,
+    currentUser: null,
     
     init() {
         this.sidebarContainer = document.getElementById('sidebar-container');
         this.routerView = document.getElementById('router-view');
         this.loadingView = document.getElementById('view-loading');
+        
+        const storedUser = localStorage.getItem('currentUser');
+        if (storedUser) this.currentUser = JSON.parse(storedUser);
+        
         window.addEventListener('hashchange', () => this.handleRoute());
         this.handleRoute();
-        this.renderSidebar();
     },
 
     handleRoute() {
-        const hash = window.location.hash.replace('#', '') || 'admin';
-        this.currentView = hash;
+        if (!this.currentUser) {
+            const hash = window.location.hash.replace('#', '') || 'login';
+            if (hash === 'forgot') {
+                this.currentView = 'forgot';
+            } else {
+                this.currentView = 'login';
+                window.location.hash = 'login';
+            }
+        } else {
+            const hash = window.location.hash.replace('#', '') || 'admin';
+            this.currentView = hash === 'login' ? 'admin' : hash;
+        }
         this.renderView();
         this.renderSidebar();
     },
 
     renderSidebar() {
-        this.sidebarContainer.innerHTML = Components.Sidebar(this.currentView);
-        lucide.createIcons();
+        if (!this.currentUser || this.currentView === 'login') {
+            this.sidebarContainer.innerHTML = '';
+            this.sidebarContainer.style.display = 'none';
+        } else {
+            this.sidebarContainer.style.display = 'flex';
+            this.sidebarContainer.innerHTML = Components.Sidebar(this.currentView);
+            lucide.createIcons();
+        }
     },
 
     async renderView() {
@@ -29,6 +49,12 @@ const App = {
         try {
             let html = '';
             switch(this.currentView) {
+                case 'login':
+                    html = Components.LoginView();
+                    break;
+                case 'forgot':
+                    html = Components.ForgotPasswordView();
+                    break;
                 case 'admin':
                     const [stats, apps, activities] = await Promise.all([API.getStats(), API.getApplications(), API.getActivities()]);
                     html = Components.AdminDashboard(stats, apps, activities);
@@ -95,6 +121,60 @@ const App = {
             this.routerView.style.display = 'block';
             window.dispatchEvent(new CustomEvent('view-changed'));
         }
+    },
+
+    // ===== AUTH HANDLERS =====
+    async handleLogin(event) {
+        event.preventDefault();
+        const d = Object.fromEntries(new FormData(event.target).entries());
+        try {
+            const res = await API.login(d.userid, d.password);
+            if (res.success) {
+                this.currentUser = res.user;
+                localStorage.setItem('currentUser', JSON.stringify(res.user));
+                window.location.hash = 'admin';
+                this.handleRoute();
+            }
+        } catch(e) {
+            alert('Login failed: ' + e.message);
+        }
+    },
+
+    async handleForgotPassword(event) {
+        event.preventDefault();
+        const email = document.getElementById('reset-email').value;
+        try {
+            const res = await API.forgotPassword(email);
+            if (res.success) {
+                document.getElementById('forgot-step-1').style.display = 'none';
+                document.getElementById('forgot-step-2').style.display = 'block';
+            }
+        } catch(e) {
+            alert('Error: ' + e.message);
+        }
+    },
+
+    async handleResetPassword(event) {
+        event.preventDefault();
+        const email = document.getElementById('reset-email').value;
+        const d = Object.fromEntries(new FormData(event.target).entries());
+        try {
+            const res = await API.resetPassword(email, d.otp, d.newPassword);
+            if (res.success) {
+                alert('Password reset successfully! Please login with your new password.');
+                window.location.hash = 'login';
+            }
+        } catch(e) {
+            alert('Error: ' + e.message);
+        }
+    },
+
+    handleLogout() {
+        if (!confirm('Are you sure you want to logout?')) return;
+        this.currentUser = null;
+        localStorage.removeItem('currentUser');
+        window.location.hash = 'login';
+        this.handleRoute();
     },
 
     // ===== STUDENT HANDLERS =====

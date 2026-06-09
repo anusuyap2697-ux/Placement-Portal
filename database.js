@@ -23,16 +23,17 @@ function initializeSchema() {
         // 2. Students Table (enhanced with arrears, verification, phone)
         db.run(`CREATE TABLE IF NOT EXISTS students (
             id TEXT PRIMARY KEY,
-            name TEXT NOT NULL,
+            name TEXT,
             dept TEXT,
             gpa REAL,
-            email TEXT,
-            phone TEXT DEFAULT '',
-            dob TEXT,
-            skills TEXT DEFAULT '',
+            email TEXT UNIQUE,
+            phone TEXT,
+            dob DATE,
+            skills TEXT,
             arrears INTEGER DEFAULT 0,
             verified INTEGER DEFAULT 0,
-            status TEXT DEFAULT 'Applied'
+            status TEXT DEFAULT 'Pending',
+            password TEXT DEFAULT 'password123'
         )`);
 
         // 3. Companies Table (enhanced with approval)

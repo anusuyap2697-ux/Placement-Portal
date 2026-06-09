@@ -1,4 +1,54 @@
 const Components = {
+    LoginView() {
+        return `<div class="fade-in" style="height:100vh;display:flex;align-items:center;justify-content:center;background:var(--background);">
+            <div class="glass" style="padding:3rem;width:100%;max-width:400px;text-align:center;border-radius:var(--radius-lg);">
+                <div style="width:60px;height:60px;background:linear-gradient(135deg,var(--primary),var(--secondary));border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1.5rem auto;">
+                    <i data-lucide="lock" style="color:white;" size="28"></i>
+                </div>
+                <h1 style="margin-bottom:0.5rem;font-size:1.8rem;">Placement Portal</h1>
+                <p style="color:var(--text-muted);margin-bottom:2rem;font-size:0.9rem;">Sign in to access your dashboard</p>
+                
+                <form id="login-form" onsubmit="App.handleLogin(event)" style="display:flex;flex-direction:column;gap:1rem;">
+                    <input type="text" name="userid" placeholder="User ID (e.g., S001 or admin)" class="glass" style="border:1px solid var(--surface-border);border-radius:var(--radius-md);padding:0.75rem;color:white;width:100%;" required>
+                    <input type="password" name="password" placeholder="Password" class="glass" style="border:1px solid var(--surface-border);border-radius:var(--radius-md);padding:0.75rem;color:white;width:100%;" required>
+                    <button type="submit" class="btn btn-primary" style="padding:0.75rem;font-size:1rem;margin-top:0.5rem;width:100%;">Sign In</button>
+                    <a href="#forgot" style="color:var(--primary);font-size:0.85rem;margin-top:0.5rem;text-decoration:none;">Forgot Password?</a>
+                </form>
+            </div>
+        </div>`;
+    },
+
+    ForgotPasswordView() {
+        return `<div class="fade-in" style="height:100vh;display:flex;align-items:center;justify-content:center;background:var(--background);">
+            <div class="glass" style="padding:3rem;width:100%;max-width:400px;text-align:center;border-radius:var(--radius-lg);">
+                <div style="width:60px;height:60px;background:linear-gradient(135deg,var(--primary),var(--secondary));border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1.5rem auto;">
+                    <i data-lucide="mail" style="color:white;" size="28"></i>
+                </div>
+                <h1 style="margin-bottom:0.5rem;font-size:1.8rem;">Reset Password</h1>
+                <p style="color:var(--text-muted);margin-bottom:2rem;font-size:0.9rem;">Verify your email to continue</p>
+                
+                <div id="forgot-step-1">
+                    <form onsubmit="App.handleForgotPassword(event)" style="display:flex;flex-direction:column;gap:1rem;">
+                        <input type="email" name="email" id="reset-email" placeholder="Enter your registered email" class="glass" style="border:1px solid var(--surface-border);border-radius:var(--radius-md);padding:0.75rem;color:white;width:100%;" required>
+                        <button type="submit" class="btn btn-primary" style="padding:0.75rem;font-size:1rem;width:100%;">Send Verification Code</button>
+                    </form>
+                    <a href="#login" style="color:var(--text-muted);font-size:0.85rem;margin-top:1.5rem;display:inline-block;text-decoration:none;">Back to Login</a>
+                </div>
+
+                <div id="forgot-step-2" style="display:none;">
+                    <form onsubmit="App.handleResetPassword(event)" style="display:flex;flex-direction:column;gap:1rem;">
+                        <div style="background:rgba(99,102,241,0.1);color:var(--primary);padding:0.5rem;border-radius:var(--radius-sm);font-size:0.8rem;margin-bottom:0.5rem;">
+                            For demo purposes, the verification code is always: <strong>123456</strong>
+                        </div>
+                        <input type="text" name="otp" placeholder="6-digit Verification Code" class="glass" style="border:1px solid var(--surface-border);border-radius:var(--radius-md);padding:0.75rem;color:white;width:100%;" required>
+                        <input type="password" name="newPassword" placeholder="New Password" class="glass" style="border:1px solid var(--surface-border);border-radius:var(--radius-md);padding:0.75rem;color:white;width:100%;" required>
+                        <button type="submit" class="btn btn-primary" style="padding:0.75rem;font-size:1rem;width:100%;">Reset Password</button>
+                    </form>
+                </div>
+            </div>
+        </div>`;
+    },
+
     Sidebar(activeView = 'admin') {
         const links = [
             { id: 'admin', icon: 'layout-dashboard', label: 'Dashboard' },
@@ -28,7 +78,7 @@ const Components = {
                 <nav class="sidebar-nav">
                     ${links.map(link => `<a href="#${link.id}" class="nav-link ${activeView === link.id ? 'active' : ''}" data-view="${link.id}"><i data-lucide="${link.icon}" size="18"></i><span>${link.label}</span></a>`).join('')}
                 </nav>
-                <div style="margin-top:auto;"><a href="#" class="nav-link" style="color:var(--danger);" onclick="alert('Demo Logout')"><i data-lucide="log-out" size="18"></i><span>Logout</span></a></div>
+                <div style="margin-top:auto;"><a href="#" class="nav-link" style="color:var(--danger);" onclick="App.handleLogout()"><i data-lucide="log-out" size="18"></i><span>Logout</span></a></div>
             </div>`;
     },
 
@@ -64,6 +114,7 @@ const Components = {
                     <div><label style="font-size:0.7rem;color:var(--text-muted);">DOB</label><input type="date" name="dob" class="glass" style="width:100%;border:1px solid var(--surface-border);border-radius:var(--radius-md);padding:0.5rem;color:white;" required></div>
                     <input type="text" name="skills" placeholder="Skills (comma sep)" class="glass" style="border:1px solid var(--surface-border);border-radius:var(--radius-md);padding:0.5rem;color:white;">
                     <input type="number" name="arrears" placeholder="Arrears" value="0" class="glass" style="border:1px solid var(--surface-border);border-radius:var(--radius-md);padding:0.5rem;color:white;">
+                    <input type="text" name="password" placeholder="Password (default: password123)" class="glass" style="border:1px solid var(--surface-border);border-radius:var(--radius-md);padding:0.5rem;color:white;">
                     <button type="submit" class="btn btn-primary">Add Student</button>
                 </form>
             </div>
