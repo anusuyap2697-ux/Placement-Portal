@@ -34,8 +34,8 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // ===== LOGIN & PASSWORD RESET =====
 app.post('/api/login', (req, res) => {
-    const { userid, password } = req.body;
-    db.get("SELECT * FROM students WHERE id = ? AND password = ?", [userid, password], (err, row) => {
+    const { email, password } = req.body;
+    db.get("SELECT * FROM students WHERE email = ? AND password = ?", [email, password], (err, row) => {
         if (err) return res.status(500).json({ error: err.message });
         if (row) {
             const user = { ...row };
@@ -43,10 +43,10 @@ app.post('/api/login', (req, res) => {
             return res.json({ success: true, user, role: 'student' });
         }
         
-        if (userid === 'admin' && password === 'admin123') {
-            return res.json({ success: true, user: { id: 'admin', name: 'Administrator' }, role: 'admin' });
+        if (email === 'admin@college.edu' && password === 'admin123') {
+            return res.json({ success: true, user: { id: 'admin', name: 'Administrator', email: 'admin@college.edu' }, role: 'admin' });
         }
-        res.status(401).json({ error: 'Invalid User ID or Password' });
+        res.status(401).json({ error: 'Invalid Email or Password' });
     });
 });
 

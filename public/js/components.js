@@ -9,7 +9,7 @@ const Components = {
                 <p style="color:var(--text-muted);margin-bottom:2rem;font-size:0.9rem;">Sign in to access your dashboard</p>
                 
                 <form id="login-form" onsubmit="App.handleLogin(event)" style="display:flex;flex-direction:column;gap:1rem;">
-                    <input type="text" name="userid" placeholder="User ID (e.g., S001 or admin)" class="glass" style="border:1px solid var(--surface-border);border-radius:var(--radius-md);padding:0.75rem;color:white;width:100%;" required>
+                    <input type="email" name="email" placeholder="Email Address (e.g., admin@college.edu)" class="glass" style="border:1px solid var(--surface-border);border-radius:var(--radius-md);padding:0.75rem;color:white;width:100%;" required>
                     <input type="password" name="password" placeholder="Password" class="glass" style="border:1px solid var(--surface-border);border-radius:var(--radius-md);padding:0.75rem;color:white;width:100%;" required>
                     <button type="submit" class="btn btn-primary" style="padding:0.75rem;font-size:1rem;margin-top:0.5rem;width:100%;">Sign In</button>
                     <a href="#forgot" style="color:var(--primary);font-size:0.85rem;margin-top:0.5rem;text-decoration:none;">Forgot Password?</a>

@@ -1,21 +1,21 @@
 /* Design System & Global Styles */
 :root {
-    --primary: #6366f1;
-    --primary-hover: #4f46e5;
-    --secondary: #ec4899;
-    --accent: #8b5cf6;
-    --background: #0f172a;
-    --surface: rgba(30, 41, 59, 0.7);
-    --surface-border: rgba(255, 255, 255, 0.1);
+    --primary: #d4af37; /* Metallic Gold */
+    --primary-hover: #fde047; /* Bright Gold */
+    --secondary: #b45309; /* Deep Bronze/Amber */
+    --accent: #f59e0b; /* Golden Orange */
+    --background: #000000; /* Pure Black */
+    --surface: rgba(20, 20, 20, 0.8); /* Dark Glass */
+    --surface-border: rgba(212, 175, 55, 0.25); /* Subtle Gold Border */
     --text-main: #f8fafc;
-    --text-muted: #94a3b8;
+    --text-muted: #9ca3af;
     --success: #10b981;
     --warning: #f59e0b;
     --danger: #ef4444;
     --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
     --radius-lg: 1rem;
     --radius-md: 0.5rem;
-    --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.3);
 }
 
 * {
@@ -76,7 +76,7 @@ p { color: var(--text-muted); }
     font-size: 0.875rem;
 }
 
-.btn-primary { background: var(--primary); color: white; }
+.btn-primary { background: var(--primary); color: #000000; font-weight: 700; }
 .btn-primary:hover { background: var(--primary-hover); transform: translateY(-1px); }
 
 .card {

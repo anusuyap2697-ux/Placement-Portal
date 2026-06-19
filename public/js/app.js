@@ -128,7 +128,7 @@ const App = {
         event.preventDefault();
         const d = Object.fromEntries(new FormData(event.target).entries());
         try {
-            const res = await API.login(d.userid, d.password);
+            const res = await API.login(d.email, d.password);
             if (res.success) {
                 this.currentUser = res.user;
                 localStorage.setItem('currentUser', JSON.stringify(res.user));
